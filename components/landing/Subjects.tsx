@@ -48,6 +48,16 @@ export function Subjects() {
   );
 }
 
+function paperCount(code: string) {
+  // Deterministic pseudo-count derived from the subject code so SSR and
+  // client render identically (avoids hydration mismatches).
+  let hash = 0;
+  for (let i = 0; i < code.length; i++) {
+    hash = (hash * 31 + code.charCodeAt(i)) >>> 0;
+  }
+  return (hash % 80) + 30;
+}
+
 function SubjectCard({ subject, delay }: { subject: any; delay: number }) {
   return (
     <motion.div
@@ -64,7 +74,7 @@ function SubjectCard({ subject, delay }: { subject: any; delay: number }) {
         <h4 className="font-display font-semibold text-base mb-2">{subject.name}</h4>
         <p className="text-xs text-text-muted">{subject.topics.length} topics</p>
         <div className="mt-3 pt-3 border-t border-accent-primary/10 text-xs text-text-secondary">
-          {Math.floor(Math.random() * 80) + 30} papers
+          {paperCount(subject.code)} papers
         </div>
       </TiltCard>
     </motion.div>
