@@ -66,7 +66,7 @@ export function SolverClient({ subjects, initialSubject, initialQuestion }: any)
   }
 
   async function trySimilar() {
-    setQuestion((q) => `${q}\n\nGenerate a similar question on the same topic and solve it.`);
+    setQuestion((q: string) => `${q}\n\nGenerate a similar question on the same topic and solve it.`);
     await solve();
   }
 

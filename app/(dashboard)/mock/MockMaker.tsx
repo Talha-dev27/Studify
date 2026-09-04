@@ -219,11 +219,11 @@ export function MockMaker({ subjects, initialSubject, initialLevel }: any) {
         ) : showAll ? (
           <div className="space-y-4">
             {questions.map((q, i) => (
-              <QuestionCard key={i} q={q} index={i} answer={answers[i] ?? ''} onChange={(v) => setAnswers((a) => ({ ...a, [i]: v }))} flagged={flagged.has(i)} onFlag={() => setFlagged((f) => { const s = new Set(f); s.has(i) ? s.delete(i) : s.add(i); return s; })} />
+              <QuestionCard key={i} q={q} index={i} answer={answers[i] ?? ''} onChange={(v: string) => setAnswers((a) => ({ ...a, [i]: v }))} flagged={flagged.has(i)} onFlag={() => setFlagged((f) => { const s = new Set(f); s.has(i) ? s.delete(i) : s.add(i); return s; })} />
             ))}
           </div>
         ) : (
-          <QuestionCard q={q} index={currentQ} answer={answers[currentQ] ?? ''} onChange={(v) => setAnswers((a) => ({ ...a, [currentQ]: v }))} flagged={flagged.has(currentQ)} onFlag={() => setFlagged((f) => { const s = new Set(f); s.has(currentQ) ? s.delete(currentQ) : s.add(currentQ); return s; })} />
+          <QuestionCard q={q} index={currentQ} answer={answers[currentQ] ?? ''} onChange={(v: string) => setAnswers((a) => ({ ...a, [currentQ]: v }))} flagged={flagged.has(currentQ)} onFlag={() => setFlagged((f) => { const s = new Set(f); s.has(currentQ) ? s.delete(currentQ) : s.add(currentQ); return s; })} />
         )}
 
         <div className="glass-card p-4 flex items-center justify-between">
