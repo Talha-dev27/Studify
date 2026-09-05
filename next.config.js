@@ -23,6 +23,18 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/auth/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, max-age=0, must-revalidate' },
+        ],
+      },
+      {
+        source: '/(login|signup|forgot-password)(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, max-age=0, must-revalidate' },
+        ],
+      },
     ];
   },
 };
