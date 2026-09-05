@@ -9,7 +9,8 @@
 .turbo
 out/
 dist/
-coverage/tsconfig.tsbuildinfo
+coverage/
+tsconfig.tsbuildinfo
 
 types/lucide-react.d.ts
 

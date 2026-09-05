@@ -67,7 +67,7 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
               setLoading(true);
               const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
-                options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard` },
+                options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/dashboard` },
               });
               if (error) { setError(error.message); setLoading(false); }
             }}
