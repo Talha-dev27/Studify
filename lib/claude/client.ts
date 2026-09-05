@@ -1,14 +1,14 @@
-import Anthropic from '@anthropic-ai/sdk';
+import Groq from 'groq-sdk';
 
-export const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
+export const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY!,
 });
 
-export const MODEL = 'claude-sonnet-4-5';
+export const MODEL = 'llama-3.3-70b-versatile';
 
 export type MessageContent =
   | { type: 'text'; text: string }
-  | { type: 'image'; source: { type: 'base64'; media_type: string; data: string } };
+  | { type: 'image_url'; image_url: { url: string } };
 
 export function buildMessage(
   text: string,
@@ -18,8 +18,10 @@ export function buildMessage(
   const content: MessageContent[] = [];
   if (imageBase64) {
     content.push({
-      type: 'image',
-      source: { type: 'base64', media_type: mediaType, data: imageBase64 },
+      type: 'image_url',
+      image_url: {
+        url: `data:${mediaType};base64,${imageBase64}`,
+      },
     });
   }
   content.push({ type: 'text', text });
@@ -32,20 +34,22 @@ export async function callClaude(
   imageBase64?: string,
   mediaType?: string,
 ): Promise<string> {
-  const message = await anthropic.messages.create({
+  const messages: any[] = [
+    { role: 'system', content: systemPrompt },
+    {
+      role: 'user',
+      content: buildMessage(userMessage, imageBase64, mediaType) as any,
+    },
+  ];
+
+  const response = await groq.chat.completions.create({
     model: MODEL,
     max_tokens: 4096,
-    system: systemPrompt,
-    messages: [
-      {
-        role: 'user',
-        content: buildMessage(userMessage, imageBase64, mediaType) as any,
-      },
-    ],
+    messages,
   });
 
-  const textBlock = message.content.find((b: any) => b.type === 'text');
-  return (textBlock as any)?.text ?? '';
+  const message = response.choices[0]?.message;
+  return message?.content ?? '';
 }
 
 export async function callClaudeJSON<T>(
@@ -55,18 +59,18 @@ export async function callClaudeJSON<T>(
   mediaType?: string,
 ): Promise<T> {
   const raw = await callClaude(systemPrompt, userMessage, imageBase64, mediaType);
-  // Try to extract JSON from response (handles markdown ```json blocks)
   const match = raw.match(/```json\s*([\s\S]*?)```/) ?? raw.match(/\{[\s\S]*\}/);
   const jsonStr = match ? (match[1] ?? match[0]) : raw;
   try {
     return JSON.parse(jsonStr) as T;
   } catch {
-    // Attempt a relaxed parse - find first { to last }
     const start = raw.indexOf('{');
     const end = raw.lastIndexOf('}');
     if (start >= 0 && end > start) {
       return JSON.parse(raw.slice(start, end + 1)) as T;
     }
-    throw new Error('Failed to parse Claude response as JSON');
+    throw new Error('Failed to parse LLM response as JSON');
   }
 }
+
+export { callClaude };

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { anthropic, MODEL } from '@/lib/claude/client';
+import { groq, MODEL } from '@/lib/claude/client';
 
 export async function POST(req: NextRequest) {
   try {
@@ -47,13 +47,13 @@ Return STRICT JSON (no markdown, no code fences):
 
 Grade based on these thresholds: A*>=90%, A>=80%, B>=70%, C>=60%, D>=50%, E>=40%, U<40%.`;
 
-    const message = await anthropic.messages.create({
+    const response = await groq.chat.completions.create({
       model: MODEL,
       max_tokens: 4096,
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const raw = (message.content.find((b) => b.type === 'text') as any)?.text ?? '';
+    const raw = response.choices[0]?.message?.content ?? '';
     const match = raw.match(/\{[\s\S]*\}/);
     const result = JSON.parse(match ? match[0] : raw);
 

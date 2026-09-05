@@ -36,8 +36,8 @@ async function main() {
   for (const p of SAMPLE_PAPERS) {
     const { error } = await supabase.from('papers').upsert({
       ...p,
-      pdf_url: `https://your-supabase-url.supabase.co/storage/v1/object/public/papers/${p.subject_code}_${p.year}_${p.session}_P${p.paper_number}.pdf`,
-      marking_scheme_url: `https://your-supabase-url.supabase.co/storage/v1/object/public/marking-schemes/${p.subject_code}_${p.year}_${p.session}_P${p.paper_number}_MS.pdf`,
+      pdf_url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/papers/${p.subject_code}_${p.year}_${p.session}_P${p.paper_number}.pdf`,
+      marking_scheme_url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/marking-schemes/${p.subject_code}_${p.year}_${p.session}_P${p.paper_number}_MS.pdf`,
     });
     if (error) console.error(`Error:`, error.message);
     else console.log(`✓ ${p.subject_code} ${p.year} ${p.session} P${p.paper_number}`);

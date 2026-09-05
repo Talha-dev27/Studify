@@ -3,7 +3,7 @@
  * Run: npm run seed:subjects
  */
 import { createClient } from '@supabase/supabase-js';
-import { SUBJECTS } from '../lib/subjects';
+import { SUBJECTS } from '../../lib/subjects';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 
