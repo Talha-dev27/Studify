@@ -1,11 +1,8 @@
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { Sparkles, Lock } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import ResetPasswordForm from './ResetPasswordForm';
 
 export default async function ResetPasswordPage({
