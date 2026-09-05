@@ -38,7 +38,7 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
         data: { name, level, subjects },
       },
     });
@@ -67,7 +67,7 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
               setLoading(true);
               const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
-                options: { redirectTo: `${window.location.origin}/dashboard` },
+                options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard` },
               });
               if (error) { setError(error.message); setLoading(false); }
             }}
