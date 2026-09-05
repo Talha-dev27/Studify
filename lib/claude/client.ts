@@ -72,5 +72,3 @@ export async function callClaudeJSON<T>(
     throw new Error('Failed to parse LLM response as JSON');
   }
 }
-
-export { callClaude };

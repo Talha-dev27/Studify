@@ -276,5 +276,3 @@ Predict topic probabilities and patterns. Return STRICT JSON only.`;
 
   return callClaudeJSON<PaperPrediction>(system, userMessage);
 }
-
-export { callClaude };
