@@ -12,7 +12,6 @@
     "seed:thresholds": "tsx scripts/seed/seedThresholds.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.27.0",
     "@react-three/drei": "^9.108.0",
     "@react-three/fiber": "^8.17.0",
     "@react-three/postprocessing": "^2.16.2",
