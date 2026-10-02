@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Input';
 
 export function SignupForm({ initialPlan }: { initialPlan?: string }) {
   const router = useRouter();
@@ -15,8 +16,8 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
   const [level, setLevel] = useState<'O' | 'A' | 'Both'>('Both');
   const [subjects, setSubjects] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmationSent, setConfirmationSent] = useState(false);
 
   const supabase = createClient();
 
@@ -29,59 +30,51 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
     setSubjects(s => s.includes(code) ? s.filter(x => x !== code) : [...s, code]);
   }
 
-  async function onSubmit(e?: React.FormEvent) {
-    e?.preventDefault();
+  async function createAccount() {
     setLoading(true);
     setError(null);
 
-    const nextPath = initialPlan
-      ? '/checkout?plan=' + encodeURIComponent(initialPlan)
-      : '/dashboard';
-    const redirectTo =
-      window.location.origin +
-      '/auth/callback?next=' +
-      encodeURIComponent(nextPath);
+    try {
+      const nextPath = initialPlan
+        ? `/checkout?plan=${encodeURIComponent(initialPlan)}`
+        : '/dashboard';
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
+          data: { name, level, subjects },
+        },
+      });
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectTo,
-        data: { name, level, subjects },
-      },
-    });
+      if (error) {
+        setError(error.message);
+        return;
+      }
 
-    if (error) {
-      setError(error.message);
+      if (data.session) {
+        router.push(nextPath);
+        router.refresh();
+      } else {
+        setConfirmationSent(true);
+      }
+    } catch {
+      setError('Unable to create your account right now. Check your connection and try again.');
+    } finally {
       setLoading(false);
-      return;
     }
-
-    if (data.session) {
-      router.push(nextPath);
-      router.refresh();
-      return;
-    }
-
-    // Supabase may require email confirmation before creating a session.
-    // Keep the user on this flow instead of redirecting to the removed /onboarding route.
-    setSubmitted(true);
-    setLoading(false);
   }
 
-  if (submitted) {
+  if (confirmationSent) {
     return (
-      <div className="space-y-5 text-center">
-        <div className="rounded-xl border border-accent-primary/20 bg-accent-primary/10 p-4">
-          <h2 className="heading-3 mb-2">Check your email</h2>
-          <p className="text-sm text-text-secondary">
-            We sent a confirmation link to{' '}
-            <span className="text-text-primary font-medium">{email}</span>.
-            Open it to finish creating your account.
-          </p>
-        </div>
-        <Button type="button" variant="ghost" onClick={() => setSubmitted(false)} className="w-full">
-          Use a different email
+      <div className="space-y-4 text-center" role="status">
+        <h2 className="heading-3">Check your email</h2>
+        <p className="text-text-secondary">
+          We sent a confirmation link to <span className="font-medium text-white">{email}</span>.
+          Open it to finish creating your account.
+        </p>
+        <Button type="button" variant="ghost" onClick={() => setConfirmationSent(false)}>
+          Back to sign up
         </Button>
       </div>
     );
@@ -96,21 +89,18 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
             onClick={async () => {
               setLoading(true);
               setError(null);
-              const nextPath = initialPlan
-                ? '/checkout?plan=' + encodeURIComponent(initialPlan)
-                : '/dashboard';
-              const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                  redirectTo:
-                    window.location.origin +
-                    '/auth/callback?next=' +
-                    encodeURIComponent(nextPath),
-                },
-              });
-              if (error) { setError(error.message); setLoading(false); }
+              try {
+                const { error } = await supabase.auth.signInWithOAuth({
+                  provider: 'google',
+                  options: { redirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
+                });
+                if (error) setError(error.message);
+              } catch {
+                setError('Unable to start Google sign in. Check your connection and try again.');
+              } finally {
+                setLoading(false);
+              }
             }}
-            loading={loading}
             variant="outline"
             className="w-full"
           >
@@ -143,13 +133,13 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
                 key={l}
                 type="button"
                 onClick={() => setLevel(l)}
-                className={'p-4 rounded-xl border transition-all ' + (
+                className={`p-4 rounded-xl border transition-all ${
                   level === l
                     ? 'bg-accent-primary/20 border-accent-primary'
                     : 'bg-white/[0.04] border-accent-primary/20 hover:border-accent-primary/40'
-                )}
+                }`}
               >
-                <div className="font-display font-bold">{l === 'Both' ? 'Both' : l + ' Level'}</div>
+                <div className="font-display font-bold">{l === 'Both' ? 'Both' : `${l} Level`}</div>
               </button>
             ))}
           </div>
@@ -161,11 +151,11 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
                 key={code}
                 type="button"
                 onClick={() => toggleSubject(code)}
-                className={'px-3 py-1.5 rounded-full text-xs border transition-all ' + (
+                className={`px-3 py-1.5 rounded-full text-xs border transition-all ${
                   subjects.includes(code)
                     ? 'bg-accent-primary/30 border-accent-primary text-white'
                     : 'bg-white/[0.04] border-accent-primary/20 hover:border-accent-primary/40'
-                )}
+                }`}
               >
                 {code}
               </button>
@@ -174,9 +164,7 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="ghost" onClick={() => setStep(1)}>Back</Button>
-            <Button type="button" onClick={() => onSubmit()} loading={loading} className="flex-1">
-              Create account
-            </Button>
+            <Button type="button" onClick={createAccount} loading={loading} className="flex-1">Create account</Button>
           </div>
         </div>
       )}

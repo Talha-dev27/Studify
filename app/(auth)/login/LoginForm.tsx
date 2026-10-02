@@ -22,31 +22,40 @@ export function LoginForm({ redirect }: { redirect?: string }) {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      setError(error.message);
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
+      router.push(redirect ?? '/dashboard');
+      router.refresh();
+    } catch {
+      setError('Unable to log in right now. Check your connection and try again.');
+    } finally {
       setLoading(false);
-      return;
     }
-
-    router.push(redirect ?? '/dashboard');
-    router.refresh();
   }
 
   async function onGoogle() {
     setGoogleLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/dashboard`,
-      },
-    });
-    if (error) {
-      setError(error.message);
+    setError(null);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+        },
+      });
+      if (error) setError(error.message);
+    } catch {
+      setError('Unable to start Google sign in. Check your connection and try again.');
+    } finally {
       setGoogleLoading(false);
     }
   }
