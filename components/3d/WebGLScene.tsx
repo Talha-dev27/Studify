@@ -10,8 +10,8 @@ export function WebGLScene({ fallback }: { fallback: ReactNode }) {
   return (
     <Canvas
       camera={{ position: [0, 0, 8], fov: 55 }}
-      dpr={[1, 1.5]}
-      gl={{ antialias: true, alpha: true }}
+      dpr={[1, 1.25]}
+      gl={{ antialias: false, alpha: true, powerPreference: 'low-power' }}
       fallback={fallback}
     >
       <color attach="background" args={['#050510']} />
@@ -22,7 +22,7 @@ export function WebGLScene({ fallback }: { fallback: ReactNode }) {
       <Suspense fallback={null}>
         <MouseParallax>
           <FloatingOrbs />
-          <ParticleField count={900} />
+          <ParticleField count={450} />
         </MouseParallax>
       </Suspense>
     </Canvas>

@@ -282,32 +282,59 @@ body {
 .ambient-backdrop::before {
   content: '';
   position: absolute;
-  inset: -4%;
+  inset: -18%;
   background:
-    radial-gradient(ellipse at 25% 30%, rgba(108, 99, 255, 0.2), transparent 48%),
-    radial-gradient(ellipse at 78% 34%, rgba(0, 212, 255, 0.12), transparent 42%),
-    radial-gradient(ellipse at 54% 92%, rgba(255, 107, 214, 0.09), transparent 40%);
+    radial-gradient(ellipse at 25% 30%, rgba(108, 99, 255, 0.3), transparent 48%),
+    radial-gradient(ellipse at 78% 34%, rgba(0, 212, 255, 0.2), transparent 42%),
+    radial-gradient(ellipse at 54% 92%, rgba(255, 107, 214, 0.14), transparent 40%);
   will-change: transform;
-  animation: ambient-drift 30s ease-in-out infinite alternate;
+  animation: ambient-drift 18s ease-in-out infinite alternate;
+}
+
+.ambient-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(ellipse at 70% 74%, rgba(0, 212, 255, 0.14), transparent 34%),
+    radial-gradient(ellipse at 18% 76%, rgba(108, 99, 255, 0.12), transparent 32%);
+  will-change: transform;
+  animation: ambient-drift-reverse 23s ease-in-out infinite alternate;
 }
 
 .ambient-particles {
   position: absolute;
   inset: 0;
+  z-index: 1;
   opacity: 0.24;
   background-image:
     radial-gradient(circle, rgba(190, 185, 255, 0.8) 1px, transparent 1.5px),
     radial-gradient(circle, rgba(0, 212, 255, 0.65) 1px, transparent 1.5px);
   background-size: 89px 89px, 137px 137px;
+  will-change: transform;
+  animation: ambient-stars 36s linear infinite;
 }
 
 @keyframes ambient-drift {
-  from { transform: translate3d(-1%, -1%, 0) scale(1); }
-  to { transform: translate3d(1%, 1%, 0) scale(1.03); }
+  from { transform: translate3d(-5%, -3%, 0) scale(1.02); }
+  to { transform: translate3d(5%, 3%, 0) scale(1.12); }
+}
+
+@keyframes ambient-drift-reverse {
+  from { transform: translate3d(4%, 3%, 0) scale(1.08); }
+  to { transform: translate3d(-4%, -3%, 0) scale(1); }
+}
+
+@keyframes ambient-stars {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-2%, 1%, 0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ambient-backdrop::before {
+  .ambient-backdrop::before,
+  .ambient-backdrop::after,
+  .ambient-particles {
     animation: none;
+    will-change: auto;
   }
 }

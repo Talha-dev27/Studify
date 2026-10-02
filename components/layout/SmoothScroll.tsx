@@ -10,14 +10,30 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
+    let frameId = 0;
 
     function raf(time: number) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      frameId = requestAnimationFrame(raf);
     }
-    requestAnimationFrame(raf);
+    frameId = requestAnimationFrame(raf);
 
-    return () => lenis.destroy();
+    function handleVisibilityChange() {
+      if (document.hidden) {
+        cancelAnimationFrame(frameId);
+        frameId = 0;
+      } else if (frameId === 0) {
+        frameId = requestAnimationFrame(raf);
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      lenis.destroy();
+    };
   }, []);
 
   return <>{children}</>;
