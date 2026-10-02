@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
-import { SmoothScroll } from '@/components/layout/SmoothScroll';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -27,7 +26,7 @@ export const metadata: Metadata = {
   title: 'Cambridge AI — Study Smarter. Score Higher.',
   description:
     'AI-powered past papers, mock exams, and grade insights for Cambridge O & A Level students worldwide.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://studify.vercel.app'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
   openGraph: {
     title: 'Cambridge AI — Study Smarter. Score Higher.',
     description:
@@ -50,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
       <body className="bg-bg-primary text-text-primary antialiased">
-        <SmoothScroll>{children}</SmoothScroll>
+        {children}
       </body>
     </html>
   );

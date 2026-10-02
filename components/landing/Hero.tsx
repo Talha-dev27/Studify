@@ -13,13 +13,18 @@ const HeroScene = dynamic(
 export function Hero() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-32">
+      <div className="fixed inset-0 z-0 pointer-events-none" aria-hidden="true">
+        <div className="ambient-backdrop">
+          <span className="ambient-particles" />
+        </div>
+      </div>
       <HeroScene />
 
       <div className="relative z-10 container-app mx-auto text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.25 }}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card mb-8 text-sm"
         >
           <Sparkles className="w-4 h-4 text-accent-cyan" />
@@ -31,7 +36,7 @@ export function Hero() {
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
+          transition={{ duration: 0.3, delay: 0.05 }}
           className="heading-hero"
         >
           <span className="block">Study Smarter.</span>
@@ -41,7 +46,7 @@ export function Hero() {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
           className="mt-8 max-w-2xl mx-auto text-lg md:text-xl text-text-secondary"
         >
           AI-powered past papers, mock exams, and grade insights for Cambridge O & A Level students.
@@ -50,7 +55,7 @@ export function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
           className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <Link
@@ -71,7 +76,7 @@ export function Hero() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1 }}
+          transition={{ duration: 0.3, delay: 0.25 }}
           className="mt-20 flex items-center justify-center gap-6 text-xs text-text-muted"
         >
           <div className="flex -space-x-2">

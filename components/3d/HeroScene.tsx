@@ -41,9 +41,11 @@ export function HeroScene() {
     };
   }, []);
 
+  if (!WebGLScene) return null;
+
   return (
     <div className="fixed inset-0 z-0 pointer-events-none" aria-hidden="true">
-      {WebGLScene ? <WebGLScene fallback={fallback} /> : fallback}
+      <WebGLScene fallback={fallback} />
     </div>
   );
 }
