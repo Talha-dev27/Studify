@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Input';
 
 export function SignupForm({ initialPlan }: { initialPlan?: string }) {
   const router = useRouter();
@@ -16,6 +15,7 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
   const [level, setLevel] = useState<'O' | 'A' | 'Both'>('Both');
   const [subjects, setSubjects] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const supabase = createClient();
@@ -29,16 +29,24 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
     setSubjects(s => s.includes(code) ? s.filter(x => x !== code) : [...s, code]);
   }
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function onSubmit(e?: React.FormEvent) {
+    e?.preventDefault();
     setLoading(true);
     setError(null);
+
+    const nextPath = initialPlan
+      ? '/checkout?plan=' + encodeURIComponent(initialPlan)
+      : '/dashboard';
+    const redirectTo =
+      window.location.origin +
+      '/auth/callback?next=' +
+      encodeURIComponent(nextPath);
 
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+        emailRedirectTo: redirectTo,
         data: { name, level, subjects },
       },
     });
@@ -50,11 +58,33 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
     }
 
     if (data.session) {
-      router.push(initialPlan ? `/checkout?plan=${initialPlan}` : '/dashboard');
+      router.push(nextPath);
       router.refresh();
-    } else {
-      router.push('/onboarding');
+      return;
     }
+
+    // Supabase may require email confirmation before creating a session.
+    // Keep the user on this flow instead of redirecting to the removed /onboarding route.
+    setSubmitted(true);
+    setLoading(false);
+  }
+
+  if (submitted) {
+    return (
+      <div className="space-y-5 text-center">
+        <div className="rounded-xl border border-accent-primary/20 bg-accent-primary/10 p-4">
+          <h2 className="heading-3 mb-2">Check your email</h2>
+          <p className="text-sm text-text-secondary">
+            We sent a confirmation link to{' '}
+            <span className="text-text-primary font-medium">{email}</span>.
+            Open it to finish creating your account.
+          </p>
+        </div>
+        <Button type="button" variant="ghost" onClick={() => setSubmitted(false)} className="w-full">
+          Use a different email
+        </Button>
+      </div>
+    );
   }
 
   return (
@@ -65,12 +95,22 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
             type="button"
             onClick={async () => {
               setLoading(true);
+              setError(null);
+              const nextPath = initialPlan
+                ? '/checkout?plan=' + encodeURIComponent(initialPlan)
+                : '/dashboard';
               const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
-                options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/dashboard` },
+                options: {
+                  redirectTo:
+                    window.location.origin +
+                    '/auth/callback?next=' +
+                    encodeURIComponent(nextPath),
+                },
               });
               if (error) { setError(error.message); setLoading(false); }
             }}
+            loading={loading}
             variant="outline"
             className="w-full"
           >
@@ -103,13 +143,13 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
                 key={l}
                 type="button"
                 onClick={() => setLevel(l)}
-                className={`p-4 rounded-xl border transition-all ${
+                className={'p-4 rounded-xl border transition-all ' + (
                   level === l
                     ? 'bg-accent-primary/20 border-accent-primary'
                     : 'bg-white/[0.04] border-accent-primary/20 hover:border-accent-primary/40'
-                }`}
+                )}
               >
-                <div className="font-display font-bold">{l === 'Both' ? 'Both' : `${l} Level`}</div>
+                <div className="font-display font-bold">{l === 'Both' ? 'Both' : l + ' Level'}</div>
               </button>
             ))}
           </div>
@@ -121,11 +161,11 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
                 key={code}
                 type="button"
                 onClick={() => toggleSubject(code)}
-                className={`px-3 py-1.5 rounded-full text-xs border transition-all ${
+                className={'px-3 py-1.5 rounded-full text-xs border transition-all ' + (
                   subjects.includes(code)
                     ? 'bg-accent-primary/30 border-accent-primary text-white'
                     : 'bg-white/[0.04] border-accent-primary/20 hover:border-accent-primary/40'
-                }`}
+                )}
               >
                 {code}
               </button>
@@ -134,7 +174,9 @@ export function SignupForm({ initialPlan }: { initialPlan?: string }) {
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="ghost" onClick={() => setStep(1)}>Back</Button>
-            <Button type="button" onClick={onSubmit} loading={loading} className="flex-1">Create account</Button>
+            <Button type="button" onClick={() => onSubmit()} loading={loading} className="flex-1">
+              Create account
+            </Button>
           </div>
         </div>
       )}
