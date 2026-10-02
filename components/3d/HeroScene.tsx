@@ -28,10 +28,15 @@ export function HeroScene() {
   }, []);
 
   return (
-    <div
-      className="fixed inset-0 z-0 pointer-events-none bg-[radial-gradient(ellipse_at_50%_40%,rgba(108,99,255,0.16),transparent_60%),radial-gradient(ellipse_at_80%_20%,rgba(0,212,255,0.08),transparent_45%)]"
-      aria-hidden="true"
-    >
+    <div className="fixed inset-0 z-0 pointer-events-none" aria-hidden="true">
+      {!webglAvailable && (
+        <div className="ambient-backdrop">
+          <span className="ambient-glow ambient-glow--purple" />
+          <span className="ambient-glow ambient-glow--cyan" />
+          <span className="ambient-glow ambient-glow--pink" />
+          <span className="ambient-particles" />
+        </div>
+      )}
       {webglAvailable && (
         <Canvas
           camera={{ position: [0, 0, 8], fov: 55 }}
