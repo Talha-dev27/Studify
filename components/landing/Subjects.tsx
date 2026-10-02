@@ -49,6 +49,11 @@ export function Subjects() {
 }
 
 function SubjectCard({ subject, delay }: { subject: any; delay: number }) {
+  const paperCount = Array.from(subject.code).reduce(
+    (total: number, character: string) => total + character.charCodeAt(0),
+    0,
+  ) % 80 + 30;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -64,7 +69,7 @@ function SubjectCard({ subject, delay }: { subject: any; delay: number }) {
         <h4 className="font-display font-semibold text-base mb-2">{subject.name}</h4>
         <p className="text-xs text-text-muted">{subject.topics.length} topics</p>
         <div className="mt-3 pt-3 border-t border-accent-primary/10 text-xs text-text-secondary">
-          {Math.floor(Math.random() * 80) + 30} papers
+          {paperCount} papers
         </div>
       </TiltCard>
     </motion.div>
