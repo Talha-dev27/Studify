@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   title: 'Cambridge AI — Study Smarter. Score Higher.',
   description:
     'AI-powered past papers, mock exams, and grade insights for Cambridge O & A Level students worldwide.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://studify.vercel.app'),
   openGraph: {
     title: 'Cambridge AI — Study Smarter. Score Higher.',
     description:
